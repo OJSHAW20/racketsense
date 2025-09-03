@@ -24,6 +24,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9fbeaae8-af22-46ac-9521-1b79b55081de"
+      }
+    },
+    "owner": "ojshaw.expo"
   }
 }

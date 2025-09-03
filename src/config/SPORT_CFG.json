@@ -1,0 +1,6 @@
+{
+  "version": "init",
+  "tennis":     { "rallyGapSec": 2.0, "accelHpHz": 2.0, "impactG": 3.5, "gyroPeakDps": 450, "radiusM": 0.30, "refractoryMs": 150 },
+  "padel":      { "rallyGapSec": 2.5, "accelHpHz": 2.0, "impactG": 3.0, "gyroPeakDps": 380, "radiusM": 0.27, "refractoryMs": 150 },
+  "pickleball": { "rallyGapSec": 1.8, "accelHpHz": 2.2, "impactG": 2.2, "gyroPeakDps": 300, "radiusM": 0.23, "refractoryMs": 140 }
+}
