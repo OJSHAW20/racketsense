@@ -8,3 +8,8 @@ export function getJSON<T>(key: string, fallback: T): T {
 export function setJSON(key: string, value: any) {
   db.set(key, JSON.stringify(value));
 }
+
+export function del(key: string) {
+  const db2 = new MMKV();
+  db2.delete(key);
+}

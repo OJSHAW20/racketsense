@@ -24,5 +24,8 @@ module.exports = {
         + '|d3-shape'
       + ')/)',
     ],
+    moduleNameMapper: {
+        '^react-native-mmkv$': '<rootDir>/__mocks__/react-native-mmkv.ts',
+      },
   };
   
