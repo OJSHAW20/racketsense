@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "racketsense",
-    "slug": "racketsense",
+    "name": "Aurevo",
+    "slug": "Aurevo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,6 +26,10 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
+    "QA_MODE_ENABLED": true,
+    "USE_MOCK_BLE": true,
+    "DEMO_SEED_ENABLED": false,
+    "REAL_BLE": false,
       "eas": {
         "projectId": "9fbeaae8-af22-46ac-9521-1b79b55081de"
       }

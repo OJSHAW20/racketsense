@@ -8,14 +8,15 @@ import { getCfg } from '../lib/sportConfig';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Recording'>;
 
-export default function RecordingScreen({ navigation }: Props) {
+export default function RecordingScreen({ route, navigation }: Props) {
+  const { sport } = route.params as { sport: 'tennis' | 'padel' | 'pickleball' };
   const [swings, setSwings] = useState(0);
   const [rally, setRally] = useState(0);
   const [peak, setPeak] = useState(0);
+  const [startedAtMs] = useState(() => Date.now());
 
   useEffect(() => {
-    // Start a Tennis session for now
-    startSession(getCfg('tennis'), {
+    startSession(getCfg(sport), {
       onLiveUpdate: ({ swings, rally, peakSpeed }) => {
         setSwings(swings);
         setRally(rally);
@@ -25,16 +26,24 @@ export default function RecordingScreen({ navigation }: Props) {
 
     const unsub = MockBle.subscribeImu((batch) => ingest(batch));
     return () => { unsub(); };
-  }, []);
+  }, [sport]);
 
   const end = () => {
     const summary = endSession();
-    navigation.replace('Summary', summary);
+    navigation.replace('Summary', {
+      sport,
+      startedAtMs,
+      durationMs: summary.durationMs,
+      swings: summary.swings,
+      maxRally: summary.maxRally,
+      avgSpeed: summary.avgSpeed,
+      maxSpeed: summary.maxSpeed,
+    });
   };
 
   return (
     <View style={{ flex:1, alignItems:'center', justifyContent:'center', gap:10 }}>
-      <Text style={{ fontSize:18, fontWeight:'600' }}>Recording •</Text>
+      <Text style={{ fontSize:18, fontWeight:'600' }}>Recording • {sport.toUpperCase()}</Text>
       <Text>Swings: {swings}</Text>
       <Text>Current rally: {rally}</Text>
       <Text>Peak speed: {peak.toFixed(2)} m/s</Text>
