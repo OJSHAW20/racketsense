@@ -10,7 +10,7 @@ import SessionDetailScreen from '../screens/SessionDetailScreen';
 
 export type RootStackParamList = {
   Home: undefined;
-  Recording: undefined;
+  Recording: { sport: string };
   Summary: {
     sport: string;
     durationMs: number;
