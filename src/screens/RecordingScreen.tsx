@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Button } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
-import MockBle from '../services/mockBle';
+import type { RootStackParamList } from '../navigation/types';
+import { BLE } from '../services/ble';
 import { startSession, ingest, endSession } from '../lib/metrics';
 import { getCfg } from '../lib/sportConfig';
+import type { Sample } from '../types/ble';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Recording'>;
 
@@ -16,15 +17,18 @@ export default function RecordingScreen({ route, navigation }: Props) {
   const [startedAtMs] = useState(() => Date.now());
 
   useEffect(() => {
+
     startSession(getCfg(sport), {
       onLiveUpdate: ({ swings, rally, peakSpeed }) => {
         setSwings(swings);
         setRally(rally);
         setPeak(peakSpeed);
       },
+
+      
     });
 
-    const unsub = MockBle.subscribeImu((batch) => ingest(batch));
+    const unsub = BLE.subscribeImu((batch: Sample[]) => ingest(batch));
     return () => { unsub(); };
   }, [sport]);
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Button } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/RootNavigator';
+import type { RootStackParamList } from '../navigation/types';
 import { useSessionStore } from '../store/sessionStore';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Summary'>;

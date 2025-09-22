@@ -103,3 +103,4 @@ export const MockBle = {
 
 // Export both ways to avoid import mismatches
 export default MockBle;
+export const Ble = MockBle;
