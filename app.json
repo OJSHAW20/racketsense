@@ -13,23 +13,34 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.racketsense",
+      "infoPlist": {
+        "NSBluetoothAlwaysUsageDescription": "RacketSense uses Bluetooth to connect to your racket strap and record motion.",
+        "NSBluetoothPeripheralUsageDescription": "RacketSense uses Bluetooth to connect to your racket strap and record motion."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.yourcompany.racketsense",
+      "permissions": [
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
       "edgeToEdgeEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-    "QA_MODE_ENABLED": true,
-    "USE_MOCK_BLE": true,
-    "DEMO_SEED_ENABLED": false,
-    "REAL_BLE": false,
+      "QA_MODE_ENABLED": true,
+      "USE_MOCK_BLE": true,
+      "DEMO_SEED_ENABLED": false,
+      "REAL_BLE": false,
       "eas": {
         "projectId": "9fbeaae8-af22-46ac-9521-1b79b55081de"
       }
