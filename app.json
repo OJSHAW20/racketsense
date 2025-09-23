@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Aurevo",
-    "slug": "Aurevo",
+    "name": "racketsense",
+    "slug": "racketsense",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.yourcompany.racketsense",
       "infoPlist": {
         "NSBluetoothAlwaysUsageDescription": "RacketSense uses Bluetooth to connect to your racket strap and record motion.",
-        "NSBluetoothPeripheralUsageDescription": "RacketSense uses Bluetooth to connect to your racket strap and record motion."
+        "NSBluetoothPeripheralUsageDescription": "RacketSense uses Bluetooth to connect to your racket strap and record motion.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
