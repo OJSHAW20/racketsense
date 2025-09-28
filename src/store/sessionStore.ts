@@ -10,6 +10,12 @@ export type SessionSummary = {
   maxRally: number;
   avgSpeed: number;
   maxSpeed: number;
+  // --- metadata ---
+  strapTag?: string;
+  racket?: string;
+  gripSize?: string;
+  overgrip?: boolean;
+  notes?: string;
 };
 
 type State = {
@@ -24,7 +30,11 @@ export const useSessionStore = create<State>((set, get) => ({
   sessions: getJSON<SessionSummary[]>(KEY, []),
   add: (s) => {
     const next = [s, ...get().sessions];
-    set({ sessions: next }); setJSON(KEY, next);
+    set({ sessions: next });
+    setJSON(KEY, next);
   },
-  clear: () => { set({ sessions: [] }); setJSON(KEY, []); },
+  clear: () => {
+    set({ sessions: [] });
+    setJSON(KEY, []);
+  },
 }));

@@ -21,6 +21,12 @@ export default function SummaryScreen({ route, navigation }: Props) {
       maxRally,
       avgSpeed,
       maxSpeed,
+      // metadata placeholders (could come from qaStore later)
+      strapTag: 'Strap-A',
+      racket: 'Default Racket',
+      gripSize: 'M',
+      overgrip: false,
+      notes: '',
     });
     navigation.navigate('History');
   };
@@ -37,6 +43,11 @@ export default function SummaryScreen({ route, navigation }: Props) {
       <Text>Max rally: {maxRally}</Text>
       <Text>Avg speed: {avgSpeed.toFixed(2)} m/s</Text>
       <Text>Max speed: {maxSpeed.toFixed(2)} m/s</Text>
+      <Text style={{ marginTop: 12, fontWeight: '600' }}>Metadata</Text>
+      <Text>Strap: Strap-A</Text>
+      <Text>Racket: Default Racket</Text>
+      <Text>Grip size: M</Text>
+      <Text>Overgrip: no</Text>
 
       <View style={{ height: 16 }} />
 

@@ -39,13 +39,19 @@ export default function SessionDetailScreen({ route }: Props) {
     return t01 * durMs;
   });
 
-  // Bucket into 5s bins
-  // NOTE: If your `bucketCounts` expects *seconds*, pass seconds:
-  //   const { counts } = bucketCounts(fakeTimesMs.map(t => t / 1000), 5);
-  // If it expects *milliseconds*, keep as-is and pass 5000:
-  //   const { counts } = bucketCounts(fakeTimesMs, 5000);
-  // The chat snippet assumed seconds; adjust if needed.
+  // Bucket into 5s bins (expects seconds)
   const { counts } = bucketCounts(fakeTimesMs.map(t => t / 1000), 5);
+
+  // ---- metadata line (add these right after the basic stats) ----
+  // Access optional fields safely without changing global types.
+  const sAny = session as any;
+  const metaBits: string[] = [];
+  if (sAny?.strapTag) metaBits.push(`Strap ${sAny.strapTag}`);
+  if (sAny?.racket) metaBits.push(sAny.racket);
+  if (sAny?.gripSize) metaBits.push(`Grip ${sAny.gripSize}`);
+  if (typeof sAny?.overgrip === 'boolean') {
+    metaBits.push(sAny.overgrip ? 'Overgrip: yes' : 'Overgrip: no');
+  }
 
   return (
     <View style={{ flex:1, padding:16, gap:8 }}>
@@ -57,6 +63,17 @@ export default function SessionDetailScreen({ route }: Props) {
       <Text>Max rally: {session.maxRally}</Text>
       <Text>Avg speed: {session.avgSpeed.toFixed(2)} m/s</Text>
       <Text>Max speed: {session.maxSpeed.toFixed(2)} m/s</Text>
+
+      {metaBits.length > 0 && (
+        <Text style={{ opacity: 0.7, marginTop: 6 }}>
+          {metaBits.join(' · ')}
+        </Text>
+      )}
+      {sAny?.notes ? (
+        <Text style={{ opacity: 0.7, marginTop: 4 }}>
+          Notes: {sAny.notes}
+        </Text>
+      ) : null}
 
       <View style={{ height: 16 }} />
       <Text style={{ opacity: 0.6, marginBottom: 6 }}>Activity over time</Text>

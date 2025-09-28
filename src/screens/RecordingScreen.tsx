@@ -35,13 +35,7 @@ export default function RecordingScreen({ route, navigation }: Props) {
   const end = () => {
     const summary = endSession();
     navigation.replace('Summary', {
-      sport,
-      startedAtMs,
-      durationMs: summary.durationMs,
-      swings: summary.swings,
-      maxRally: summary.maxRally,
-      avgSpeed: summary.avgSpeed,
-      maxSpeed: summary.maxSpeed,
+      ...summary,
     });
   };
 
