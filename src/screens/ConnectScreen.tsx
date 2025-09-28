@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, Alert } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/types';
 import { useDeviceStore } from '../store/deviceStore';
+import { MockBle, setLinkSim } from '../services/mockBle';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Connect'>;
 
@@ -22,33 +23,46 @@ export default function ConnectScreen({ navigation }: Props) {
   const [found, setFound] = useState(false);
   const [connecting, setConnecting] = useState(false);
 
-  const handleScan = () => {
+  const handleScan = async () => {
     setScanning(true);
     setFound(false);
-    setTimeout(() => {
+
+    // Use the mock BLE scanner
+    const sub = await MockBle.startScan(() => {
       setFound(true);
       setScanning(false);
-    }, 500);
+    });
+
+    // Auto-stop scan after a few seconds (ensures scanning UI turns off even on failure)
+    setTimeout(() => {
+      sub.stop();
+      setScanning(false);
+    }, 3000);
   };
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     setConnecting(true);
-    setTimeout(() => {
+    try {
+      await MockBle.connect(MOCK_DEVICE.id);
+
+      // Mark connected; link stats come from the simulator
       set({
         id: MOCK_DEVICE.id,
         name: MOCK_DEVICE.name,
         connected: true,
         rssi: MOCK_DEVICE.rssi,
         battery: MOCK_DEVICE.battery,
-        mtuTarget: 247,
-        mtuNegotiated: 247,
-        notifySamples: 10,
-        packetHz: 200,
-        dropPct: 0,
       });
-      setConnecting(false);
+
+      // Good-link defaults; tweak during testing if needed
+      setLinkSim({ mtu: 247, samplesPerNotify: 10, dropEveryN: 0 });
       navigation.goBack();
-    }, 500);
+    } catch (e: any) {
+      console.warn('Connect failed:', e);
+      Alert.alert('Connect failed', e?.message ?? 'Please try again.');
+    } finally {
+      setConnecting(false);
+    }
   };
 
   const handleDisconnect = () => {
@@ -59,11 +73,24 @@ export default function ConnectScreen({ navigation }: Props) {
     <View style={{ flex: 1, padding: 16, gap: 12 }}>
       <Text style={{ fontSize: 18, fontWeight: '600' }}>Scanner</Text>
 
-      <Button title={scanning ? 'Scanning…' : 'Scan'} onPress={handleScan} disabled={scanning} />
+      <Button
+        title={scanning ? 'Scanning…' : 'Scan'}
+        onPress={handleScan}
+        disabled={scanning}
+      />
 
       {found ? (
-        <View style={{ padding: 12, borderRadius: 12, backgroundColor: '#111827', marginTop: 8 }}>
-          <Text style={{ color: 'white', fontWeight: '600' }}>{MOCK_DEVICE.name}</Text>
+        <View
+          style={{
+            padding: 12,
+            borderRadius: 12,
+            backgroundColor: '#111827',
+            marginTop: 8,
+          }}
+        >
+          <Text style={{ color: 'white', fontWeight: '600' }}>
+            {MOCK_DEVICE.name}
+          </Text>
           <Text style={{ color: 'white' }}>RSSI {MOCK_DEVICE.rssi} dBm</Text>
           <Text style={{ color: 'white' }}>Battery {MOCK_DEVICE.battery}%</Text>
 
@@ -71,7 +98,11 @@ export default function ConnectScreen({ navigation }: Props) {
           {dev.connected ? (
             <Button title="Disconnect" onPress={handleDisconnect} />
           ) : (
-            <Button title={connecting ? 'Connecting…' : 'Connect'} onPress={handleConnect} disabled={connecting} />
+            <Button
+              title={connecting ? 'Connecting…' : 'Connect'}
+              onPress={handleConnect}
+              disabled={connecting}
+            />
           )}
         </View>
       ) : (
