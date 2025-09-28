@@ -48,7 +48,7 @@ export const MockBle = {
     const dtSample = 1000 / HZ;
     const dtBatch = dtSample * N;
 
-    let t_ms = (Date.now() & 0xffffffff);
+    let t_ms = Date.now();
 
     if (__DEV__) console.log('[mockBle] subscribeImu start', { HZ, N, dtBatch });
 
@@ -56,7 +56,7 @@ export const MockBle = {
       // pre-allocate so length is guaranteed to be N
       const batch: Sample[] = new Array(N);
       for (let i = 0; i < N; i++) {
-        const t = t_ms + i * dtSample;
+        const t = t_ms;
         batch[i] = {
           t_ms: t,
           ax: noise(0.05),
@@ -93,9 +93,14 @@ export const MockBle = {
       return batch;
     };
 
+    if (__DEV__) console.log('[mockBle] subscribeImu start', { HZ, N, dtBatch });
+
     // emit immediately, then on a fixed cadence
     onBatch(makeBatch());
-    const id = setInterval(() => onBatch(makeBatch()), dtBatch);
+    const id = setInterval(() => {
+      if (__DEV__) console.log('[mockBle] emitting batch len=', N);
+      onBatch(makeBatch());
+    }, dtBatch);
 
     return () => clearInterval(id);
   },

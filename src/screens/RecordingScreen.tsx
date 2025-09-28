@@ -26,7 +26,7 @@ export default function RecordingScreen({ route, navigation }: Props) {
       },
 
       
-    });
+    }, sport);
 
     const unsub = BLE.subscribeImu((batch: Sample[]) => ingest(batch));
     return () => { unsub(); };

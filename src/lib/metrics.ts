@@ -3,6 +3,7 @@ import type { Sample } from '../types/ble';
 import type { SportCfg } from './sportConfig';
 import { hp1, Hp1State, lpf, LpfState } from './filters';
 import { SAMPLE_HZ } from '../config/constants';
+const DBG = true;
 
 const G = 9.80665;
 const RAD_TO_DPS = 180 / Math.PI;
@@ -100,6 +101,9 @@ export function startSession(cfg: SportCfg, cbs?: Callbacks, sportName = 'tennis
 export function ingest(samples: Sample[]) {
   if (!S.cfg || samples.length === 0) return;
 
+  if (DBG) console.log('[metrics] ingest batch n=', samples.length,
+    't0=', samples[0].t_ms, 'tN=', samples[samples.length - 1].t_ms);
+
   if (S.startedAtMs === 0) {
     S.startedAtMs = samples[0].t_ms;
     S.prevTs = samples[0].t_ms;
@@ -115,6 +119,9 @@ export function ingest(samples: Sample[]) {
   const dtNom = 1 / (SAMPLE_HZ || 200);
   const dtMin = dtNom / 3;
   const dtMax = dtNom * 3;
+
+
+
 
   for (const s of samples) {
     S.lastTs = s.t_ms;
@@ -159,6 +166,7 @@ export function ingest(samples: Sample[]) {
     const isImpact = aHpMag >= accThresh && wDps >= gyroPeakDpsThresh;
 
     if (passedRefractory && isImpact) {
+      if (DBG) console.log('[metrics] IMPACT swings->', S.swings + 1, 'rally->', (S.lastImpactMs && now - S.lastImpactMs <= rallyGapMs) ? S.rally + 1 : 1);
       // rally grouping
       if (S.lastImpactMs && now - S.lastImpactMs <= rallyGapMs) {
         S.rally += 1;
