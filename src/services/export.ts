@@ -3,6 +3,7 @@ import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 import { BLE } from './ble';
 import type { Sample } from '../types/ble';
+import { useSessionStore } from '../store/sessionStore';
 
 type ActiveRec = {
   fileName: string;
@@ -118,4 +119,93 @@ export async function recordFor(durationMs: number, meta: { sport: string; devic
     if (done) await shareFile(done);
   }, durationMs);
   return p;
+}
+
+// ---------- CSV helpers ----------
+function csvEscape(v: unknown): string {
+  if (v === null || v === undefined) return '';
+  const s = String(v);
+  // wrap in quotes if contains special chars; escape quotes
+  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function buildSummariesCsv(rows: ReturnType<typeof useSessionStore.getState>['sessions']): string {
+  const header = [
+    'dateIso',
+    'sport',
+    'durationSec',
+    'swings',
+    'maxRally',
+    'avgSpeed',
+    'maxSpeed',
+    'strapTag',
+    'racket',
+    'gripSize',
+    'overgrip',
+    'notes',
+  ].join(',');
+
+  const lines = rows.map(r => [
+    csvEscape(new Date(r.dateMs).toISOString()),
+    csvEscape(r.sport),
+    csvEscape(Math.round(r.durationMs / 1000)),
+    csvEscape(r.swings),
+    csvEscape(r.maxRally),
+    csvEscape(Number.isFinite(r.avgSpeed) ? r.avgSpeed.toFixed(3) : 0),
+    csvEscape(Number.isFinite(r.maxSpeed) ? r.maxSpeed.toFixed(3) : 0),
+    csvEscape(r.strapTag ?? ''),
+    csvEscape(r.racket ?? ''),
+    csvEscape(r.gripSize ?? ''),
+    csvEscape(typeof r.overgrip === 'boolean' ? (r.overgrip ? 'yes' : 'no') : ''),
+    csvEscape(r.notes ?? ''),
+  ].join(','));
+
+  return [header, ...lines].join('\n');
+}
+
+function nowStamp() {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}`;
+}
+
+/**
+ * Export all session summaries to CSV.
+ * Returns file path (native) or "web://<name>" (web). If share=true and native, opens share sheet.
+ */
+export async function exportAllSummariesCsv(opts: { share?: boolean; filename?: string } = {}) {
+  const { share = true, filename } = opts;
+  const sessions = useSessionStore.getState().sessions;
+  const csv = buildSummariesCsv(sessions);
+  const fileName = filename ?? `summaries_${nowStamp()}.csv`;
+
+  const isWeb = Platform.OS === 'web';
+  const hasDir = !!FileSystem.documentDirectory;
+
+  if (isWeb || !hasDir) {
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    return `web://${fileName}`;
+  }
+
+  const dir = `${FileSystem.documentDirectory}exports/`;
+  await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+  const path = dir + fileName;
+
+  await FileSystem.writeAsStringAsync(path, csv, {
+    encoding: FileSystem.EncodingType.UTF8,
+  });
+
+  if (share) {
+    try { await Sharing.shareAsync(path, { mimeType: 'text/csv' }); } catch {}
+  }
+  return path;
 }
