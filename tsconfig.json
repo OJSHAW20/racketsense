@@ -7,5 +7,5 @@
     "skipLibCheck": true,
     "types": ["jest", "react", "react-native"]
   },
-  "include": ["src", "App.tsx", "index.ts"]
+  "include": ["src", "App.tsx", "index.ts", "scripts/**/*.ts"]
 }
