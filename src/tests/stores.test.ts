@@ -61,16 +61,19 @@ test('deviceStore: set() updates fields', () => {
   expect(st.battery).toBe(95);
 });
 
-test('uiStore: setSport updates sport', () => {
-  const { setSport } = useUiStore.getState();
-  setSport('tennis');
-  expect(useUiStore.getState().sport).toBe('tennis');
+// uiStore test — update names to selectedSport/setSelectedSport
+test('uiStore: setSelectedSport updates selectedSport', () => {
+  const { setSelectedSport } = useUiStore.getState();
+  setSelectedSport('tennis');
+  expect(useUiStore.getState().selectedSport).toBe('tennis');
 });
 
-test('qaStore: set updates flags', () => {
-  const { set } = useQaStore.getState();
-  set({ qa: false, strapTag: 'B' });
+// qaStore test — use explicit setters
+test('qaStore: setters update fields', () => {
+  const { setStrapTag, setOvergrip } = useQaStore.getState();
+  setStrapTag('B');
+  setOvergrip(true);
   const st = useQaStore.getState();
-  expect(st.qa).toBe(false);
   expect(st.strapTag).toBe('B');
+  expect(st.overgrip).toBe(true);
 });
